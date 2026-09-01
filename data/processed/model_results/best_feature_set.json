@@ -1,0 +1,21 @@
+{
+    "feature_set": "indices_reduced_spectral",
+    "n_features": 9,
+    "model": "random_forest",
+    "validation_accuracy": 0.625,
+    "validation_precision": 0.45161290322580644,
+    "validation_recall": 0.5833333333333334,
+    "validation_f1": 0.509090909090909,
+    "validation_roc_auc": 0.6796875,
+    "features": [
+        "B2",
+        "B4",
+        "B8",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDMI",
+        "NDWI",
+        "NBR"
+    ]
+}

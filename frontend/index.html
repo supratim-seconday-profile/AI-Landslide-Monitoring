@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        NER Landslide Early Warning System
+    </title>
+
+
+    <!-- =====================================================
+         LEAFLET
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+
+    <!-- =====================================================
+         DASHBOARD CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+    <div class="header-content">
+
+        <h1>
+            NER Landslide Early Warning System
+        </h1>
+
+        <p>
+            AI-Based Risk Monitoring & Early Warning
+        </p>
+
+    </div>
+
+
+    <div class="live-status">
+
+        <span class="live-dot"></span>
+
+        LIVE
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     STATISTICS
+========================================================= -->
+
+<section class="stats-container">
+
+
+    <div class="stat-card">
+
+        <h3>
+            Current Risk
+        </h3>
+
+        <div
+            id="current-risk"
+            class="stat-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <h3>
+            Highest Nearby Risk
+        </h3>
+
+        <div
+            id="highest-risk"
+            class="stat-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <h3>
+            Nearby Risks
+        </h3>
+
+        <div
+            id="nearby-count"
+            class="stat-value"
+        >
+            --
+        </div>
+
+    </div>
+
+
+    <div class="stat-card">
+
+        <h3>
+            Last Updated
+        </h3>
+
+        <div
+            id="last-updated"
+            class="stat-value small"
+        >
+            --
+        </div>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =========================================================
+     MAIN DASHBOARD
+========================================================= -->
+
+<main class="dashboard">
+
+
+    <!-- =====================================================
+         MAP
+    ====================================================== -->
+
+    <section class="map-panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h2>
+                    Local Landslide Risk Map
+                </h2>
+
+            </div>
+
+            <span>
+                5 km radius
+            </span>
+
+        </div>
+
+
+        <div
+            id="map-status"
+            class="map-status"
+        >
+            Initializing live monitoring...
+        </div>
+
+
+        <div id="map"></div>
+
+
+        <!-- MAP LEGEND -->
+
+        <div class="map-legend">
+
+            <strong>
+                Risk Level
+            </strong>
+
+            <div class="legend-item">
+
+                <span class="legend-dot low"></span>
+
+                LOW
+
+            </div>
+
+            <div class="legend-item">
+
+                <span class="legend-dot medium"></span>
+
+                MEDIUM
+
+            </div>
+
+            <div class="legend-item">
+
+                <span class="legend-dot high"></span>
+
+                HIGH
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         LOCAL ALERTS
+    ====================================================== -->
+
+    <section class="panel alerts-panel">
+
+        <h2>
+            ⚠ Local Alerts
+        </h2>
+
+
+        <div id="alerts">
+
+            <div class="alert">
+
+                No active alerts.
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         SELECTED LOCATION
+    ====================================================== -->
+
+    <section class="panel location-panel">
+
+        <h2>
+            📍 Selected Location
+        </h2>
+
+
+        <div
+            id="location"
+            class="location-details"
+        >
+
+            Click on the map to select a location.
+
+        </div>
+
+
+        <button
+            id="analyze-button"
+            class="primary-button"
+            type="button"
+        >
+
+            Analyze Live Risk
+
+        </button>
+
+
+        <div
+            id="analysis-status"
+            class="analysis-status"
+        >
+
+            Select a location and analyze its current
+            satellite-based risk.
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RISK DETAILS
+    ====================================================== -->
+
+    <section class="panel risk-panel">
+
+        <h2>
+            Risk Details
+        </h2>
+
+
+        <div id="risk">
+
+            No prediction available.
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         POTENTIAL LANDSLIDE ZONES
+    ====================================================== -->
+
+    <section class="panel risk-zones-panel">
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>
+                    🔴 Potential Landslide Zones
+                </h2>
+
+                <p class="section-description">
+
+                    Locations with recent AI-based
+                    landslide risk predictions.
+
+                </p>
+
+            </div>
+
+
+            <span
+                id="risk-zone-count"
+                class="section-count"
+            >
+                0
+
+            </span>
+
+        </div>
+
+
+        <div
+            id="risk-zones"
+            class="risk-zones-list"
+        >
+
+            <div class="empty-state">
+
+                Loading risk locations...
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RISK RANKING
+    ====================================================== -->
+
+   
+
+
+    <!-- =====================================================
+         WEATHER
+    ====================================================== -->
+
+    <section class="panel weather-panel">
+
+        <h2>
+            🌧️ Weather & Rainfall
+        </h2>
+
+
+        <div id="weather-status">
+
+            Select a location to load weather data.
+
+        </div>
+
+
+        <div
+            id="weather-content"
+            class="weather-content hidden"
+        >
+
+            <div class="weather-grid">
+
+                <div class="weather-item">
+
+                    <span>
+                        Temperature
+                    </span>
+
+                    <strong id="weather-temperature">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Humidity
+                    </span>
+
+                    <strong id="weather-humidity">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Current Rain
+                    </span>
+
+                    <strong id="weather-current-rain">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Wind Speed
+                    </span>
+
+                    <strong id="weather-wind">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Rainfall — 24h
+                    </span>
+
+                    <strong id="weather-rainfall-24">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="weather-item">
+
+                    <span>
+                        Rainfall — 72h
+                    </span>
+
+                    <strong id="weather-rainfall-72">
+                        --
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="rainfall-alert"
+                class="weather-alert"
+            >
+                --
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RISK HISTORY
+    ====================================================== -->
+
+    <section class="panel history-panel">
+
+        <h2>
+            📈 Risk History
+        </h2>
+
+
+        <div
+            id="history"
+            class="history-content"
+        >
+
+            <div class="history-chart-container">
+
+                <canvas
+                    id="riskHistoryChart"
+                ></canvas>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         AI PREDICTION
+    ====================================================== -->
+
+    <section class="panel prediction-panel">
+
+        <h2>
+            🤖 AI Landslide Prediction
+        </h2>
+
+
+        <p class="prediction-description">
+
+            Live satellite analysis uses environmental
+            features extracted from Google Earth Engine
+            and the trained SVM RBF model.
+
+        </p>
+
+
+        <div class="prediction-info-grid">
+
+
+            <div class="prediction-info-card">
+
+                <span>
+                    Model
+                </span>
+
+                <strong id="prediction-model">
+                    SVM RBF
+                </strong>
+
+            </div>
+
+
+            <div class="prediction-info-card">
+
+                <span>
+                    Satellite Source
+                </span>
+
+                <strong>
+                    Earth Engine
+                </strong>
+
+            </div>
+
+
+            <div class="prediction-info-card">
+
+                <span>
+                    Analysis Radius
+                </span>
+
+                <strong>
+                    5 km
+                </strong>
+
+            </div>
+
+
+            <div class="prediction-info-card">
+
+                <span>
+                    Features
+                </span>
+
+                <strong>
+                    16
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="prediction-result"
+            class="prediction-result"
+        >
+
+            Select a location and click
+            <strong>Analyze Live Risk</strong>.
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         VULNERABLE ROADS — PLACEHOLDER FOR STAGE 2
+    ====================================================== -->
+
+    <!-- =========================================================
+     VULNERABLE ROADS
+========================================================= -->
+
+<section class="panel vulnerable-roads-panel" id="vulnerable-roads-panel">
+
+    <div class="section-heading-row">
+
+        <div>
+
+            <h2>
+                🛣️ Vulnerable Roads
+            </h2>
+
+            <p class="section-description">
+                Road segments exposed to nearby landslide-risk
+                zones within the selected analysis area.
+            </p>
+
+        </div>
+
+        <div
+            id="road-count"
+            class="section-count"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         ROAD ANALYSIS STATUS
+    ====================================================== -->
+
+    <div
+        id="road-status"
+        class="road-status"
+    >
+
+        Run live analysis to identify potentially vulnerable
+        roads.
+
+    </div>
+
+
+    <!-- =====================================================
+         ROAD SUMMARY
+    ====================================================== -->
+
+    <div
+        id="road-summary"
+        class="road-summary"
+    >
+
+        <!-- JavaScript will populate this -->
+
+    </div>
+
+
+    <!-- =====================================================
+         ROAD LIST
+    ====================================================== -->
+
+    <div
+        id="road-list"
+        class="road-list"
+    >
+
+        <div class="road-empty">
+
+            <div class="road-empty-icon">
+                🛣️
+            </div>
+
+            <strong>
+                No road analysis yet
+            </strong>
+
+            <p>
+                Select a location and click
+                <strong>Analyze Live Risk</strong>
+                to identify potentially vulnerable road
+                segments.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+
+<!-- =========================================================
+     LEAFLET JS
+========================================================= -->
+
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+
+
+
+<!-- =========================================================
+     CHART.JS
+========================================================= -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js">
+</script>
+
+
+
+<!-- =========================================================
+     APPLICATION JS
+========================================================= -->
+
+<script src="app.js"></script>
+
+
+</body>
+
+</html>

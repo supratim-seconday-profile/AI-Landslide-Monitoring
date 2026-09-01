@@ -1,0 +1,30 @@
+{
+    "model_name": "final_svm_rbf",
+    "algorithm": "SVM",
+    "kernel": "rbf",
+    "C": 1.0,
+    "gamma": "scale",
+    "probability": true,
+    "threshold": 0.5,
+    "training_samples": 684,
+    "feature_count": 16,
+    "features": [
+        "B2",
+        "B3",
+        "B4",
+        "B5",
+        "B6",
+        "B7",
+        "B8",
+        "B8A",
+        "B11",
+        "B12",
+        "NDVI",
+        "NDMI",
+        "NDWI",
+        "NBR",
+        "hls_image_count",
+        "hls_valid_image_count"
+    ],
+    "target": "landslide_target"
+}

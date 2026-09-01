@@ -1,0 +1,32 @@
+.venv/
+.venv-1/
+venv/
+env/
+
+__pycache__/
+*.py[cod]
+
+.env
+.env.*
+
+.vscode/
+.idea/
+
+node_modules/
+
+*.log
+
+.DS_Store
+Thumbs.db
+
+*.zip
+*.tar
+*.gz
+
+*.db
+*.sqlite
+*.sqlite3
+
+# Large DEM files - stored separately
+data/external/dem/rasters_COP30/output_hh.tif
+data/external/dem/rasters_COP30 (1)/output_hh.tif
