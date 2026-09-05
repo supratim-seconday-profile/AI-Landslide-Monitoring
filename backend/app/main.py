@@ -3,34 +3,28 @@
 # FASTAPI BACKEND
 # ============================================================
 
-import asyncio
+from dotenv import load_dotenv
 
-from fastapi import FastAPI, Depends, HTTPException
+load_dotenv()
+
+import asyncio
+import logging
+import os
+
+from fastapi import (
+    FastAPI,
+    Depends,
+    HTTPException,
+    BackgroundTasks,
+)
+
 from fastapi.middleware.cors import CORSMiddleware
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
-
-# ============================================================
-# WEATHER
-# ============================================================
-
-from .weather_schemas import WeatherRequest
-from .services.weather_service import get_weather
-
-
-# ============================================================
-# DATABASE
-# ============================================================
-
 from .database import SessionLocal
 from .models import RiskPrediction
-
-
-# ============================================================
-# SCHEMAS
-# ============================================================
 
 from .schemas import (
     PredictionRequest,
@@ -48,13 +42,14 @@ from .risk_schemas import (
     LatestRiskResponse,
 )
 
-
-# ============================================================
-# SERVICES
-# ============================================================
+from .weather_schemas import WeatherRequest
 
 from .services.live_prediction_service import (
     run_live_prediction,
+)
+
+from .services.weather_service import (
+    get_weather,
 )
 
 from .services.risk import (
@@ -64,13 +59,30 @@ from .services.risk import (
     get_recommended_action,
 )
 
-
-# ============================================================
-# VULNERABLE ROAD ROUTE
-# ============================================================
-
 from .routes.vulnerable_roads import (
     router as vulnerable_roads_router,
+)
+
+from .routes.alerts import (
+    router as alerts_router,
+)
+
+from .services.alert_service import (
+    dispatch_alert,
+    get_alert_configuration,
+)
+
+
+# ============================================================
+# LOGGING
+# ============================================================
+
+logging.basicConfig(
+    level=logging.INFO,
+)
+
+logger = logging.getLogger(
+    "ner_landslide"
 )
 
 
@@ -78,7 +90,12 @@ from .routes.vulnerable_roads import (
 # CONFIGURATION
 # ============================================================
 
-LIVE_PREDICTION_TIMEOUT = 120
+LIVE_PREDICTION_TIMEOUT = int(
+    os.getenv(
+        "LIVE_PREDICTION_TIMEOUT",
+        "120",
+    )
+)
 
 
 # ============================================================
@@ -94,7 +111,7 @@ app = FastAPI(
         "North Eastern Region of India."
     ),
 
-    version="2.2.0",
+    version="3.0.0",
 )
 
 
@@ -102,10 +119,19 @@ app = FastAPI(
 # CORS
 # ============================================================
 
+# The frontend shown in your screenshot is running on:
+#
+# http://127.0.0.1:3002
+#
+# Therefore port 3002 must be explicitly allowed.
+
 app.add_middleware(
     CORSMiddleware,
 
     allow_origins=[
+        "http://127.0.0.1:3002",
+        "http://localhost:3002",
+
         "http://127.0.0.1:3000",
         "http://localhost:3000",
 
@@ -125,11 +151,15 @@ app.add_middleware(
 
 
 # ============================================================
-# ROUTER REGISTRATION
+# ROUTERS
 # ============================================================
 
 app.include_router(
     vulnerable_roads_router
+)
+
+app.include_router(
+    alerts_router
 )
 
 
@@ -165,7 +195,21 @@ def root():
             "running",
 
         "version":
-            "2.2.0",
+            "3.0.0",
+
+        "features": [
+            "SVM RBF landslide prediction",
+            "Earth Engine live prediction",
+            "PostGIS spatial analysis",
+            "Weather monitoring",
+            "Vulnerable road monitoring",
+            "Automatic alerts",
+            "Radius based SMS",
+            "Browser push notifications",
+            "Offline last-known-risk mode",
+            "Alert history",
+            "Alert delivery logs",
+        ],
     }
 
 
@@ -177,15 +221,24 @@ def root():
 def health():
 
     return {
-        "status":
-            "healthy",
+        "status": "healthy",
+        "service": "NER Landslide Early Warning System",
+        "version": "3.0.0",
     }
 
 
 # ============================================================
+# ALERT SYSTEM HEALTH
+# ============================================================
+
+@app.get("/alert-health")
+def alert_health():
+
+    return get_alert_configuration()
+
+
+# ============================================================
 # NORMAL ML PREDICTION
-#
-# Receives already-extracted satellite features.
 # ============================================================
 
 @app.post(
@@ -198,10 +251,6 @@ def predict(
 ):
 
     try:
-
-        # ----------------------------------------------------
-        # BUILD FEATURE DICTIONARY
-        # ----------------------------------------------------
 
         features = {
 
@@ -254,39 +303,20 @@ def predict(
                 request.hls_valid_image_count,
         }
 
-
-        # ----------------------------------------------------
-        # REAL PREDICTOR
-        #
-        # backend/app/ml/live_predictor.py
-        #
-        # There is NO predictor.py dependency.
-        # ----------------------------------------------------
-
         from .ml.live_predictor import (
             predict_landslide,
         )
-
 
         result = predict_landslide(
             features
         )
 
-
-        # ----------------------------------------------------
-        # RESULT
-        # ----------------------------------------------------
-
         probability = float(
-            result[
-                "landslide_probability"
-            ]
+            result["landslide_probability"]
         )
 
         prediction_value = int(
-            result[
-                "prediction"
-            ]
+            result["prediction"]
         )
 
         risk_level = get_risk_level(
@@ -298,43 +328,26 @@ def predict(
             "SVM RBF",
         )
 
-
-        # ----------------------------------------------------
-        # SAVE DATABASE RECORD
-        # ----------------------------------------------------
-
         record = RiskPrediction(
 
-            latitude=
-                request.latitude,
+            latitude=request.latitude,
 
-            longitude=
-                request.longitude,
+            longitude=request.longitude,
 
-            landslide_probability=
-                probability,
+            landslide_probability=probability,
 
-            prediction=
-                prediction_value,
+            prediction=prediction_value,
 
-            risk_level=
-                risk_level,
+            risk_level=risk_level,
 
-            model=
-                model_name,
+            model=model_name,
         )
-
 
         db.add(record)
 
         db.commit()
 
         db.refresh(record)
-
-
-        # ----------------------------------------------------
-        # RESPONSE
-        # ----------------------------------------------------
 
         return {
 
@@ -357,15 +370,16 @@ def predict(
                 model_name,
         }
 
-
     except Exception as exc:
 
         db.rollback()
 
+        logger.exception(
+            "Prediction failed"
+        )
+
         raise HTTPException(
-
             status_code=500,
-
             detail=(
                 "Prediction failed: "
                 + str(exc)
@@ -389,15 +403,9 @@ def local_risk(
     if request.radius_km <= 0:
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=(
-                "radius_km must be "
-                "greater than 0."
-            ),
+            detail="radius_km must be greater than 0.",
         )
-
 
     query = text(
         """
@@ -441,11 +449,8 @@ def local_risk(
         """
     )
 
-
     result = db.execute(
-
         query,
-
         {
             "latitude":
                 request.latitude,
@@ -458,13 +463,7 @@ def local_risk(
         },
     )
 
-
     rows = result.fetchall()
-
-
-    # --------------------------------------------------------
-    # NO DATA
-    # --------------------------------------------------------
 
     if not rows:
 
@@ -492,31 +491,14 @@ def local_risk(
                 "No nearby predictions available.",
         }
 
-
-    # --------------------------------------------------------
-    # HIGHEST PROBABILITY
-    # --------------------------------------------------------
-
-    probabilities = [
-
-        float(
-            row.landslide_probability
-        )
-
-        for row in rows
-
-    ]
-
-
     highest_probability = max(
-        probabilities
+        float(row.landslide_probability)
+        for row in rows
     )
-
 
     highest_risk = get_risk_level(
         highest_probability
     )
-
 
     return {
 
@@ -563,15 +545,9 @@ def nearby_risks(
     if request.radius_km <= 0:
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=(
-                "radius_km must be "
-                "greater than 0."
-            ),
+            detail="radius_km must be greater than 0.",
         )
-
 
     query = text(
         """
@@ -615,11 +591,8 @@ def nearby_risks(
         """
     )
 
-
     result = db.execute(
-
         query,
-
         {
             "latitude":
                 request.latitude,
@@ -632,12 +605,9 @@ def nearby_risks(
         },
     )
 
-
     rows = result.fetchall()
 
-
     risks = []
-
 
     for row in rows:
 
@@ -665,9 +635,7 @@ def nearby_risks(
 
             "distance_km":
                 round(
-                    float(
-                        row.distance_km
-                    ),
+                    float(row.distance_km),
                     3,
                 ),
 
@@ -677,11 +645,6 @@ def nearby_risks(
             "model":
                 row.model,
         })
-
-
-    # --------------------------------------------------------
-    # NO RISKS
-    # --------------------------------------------------------
 
     if not risks:
 
@@ -709,26 +672,14 @@ def nearby_risks(
                 [],
         }
 
-
-    # --------------------------------------------------------
-    # HIGHEST RISK
-    # --------------------------------------------------------
-
     highest_probability = max(
-
-        risk[
-            "landslide_probability"
-        ]
-
+        risk["landslide_probability"]
         for risk in risks
-
     )
-
 
     highest_risk = get_risk_level(
         highest_probability
     )
-
 
     return {
 
@@ -776,26 +727,14 @@ def risk_history(
     if radius_km <= 0:
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=(
-                "radius_km must be "
-                "greater than 0."
-            ),
+            detail="radius_km must be greater than 0.",
         )
 
-
     limit = max(
-
         1,
-
-        min(
-            limit,
-            100,
-        ),
+        min(limit, 100),
     )
-
 
     query = text(
         """
@@ -841,11 +780,8 @@ def risk_history(
         """
     )
 
-
     result = db.execute(
-
         query,
-
         {
             "latitude":
                 latitude,
@@ -861,12 +797,9 @@ def risk_history(
         },
     )
 
-
     rows = result.fetchall()
 
-
     predictions = []
-
 
     for row in rows:
 
@@ -894,9 +827,7 @@ def risk_history(
 
             "distance_km":
                 round(
-                    float(
-                        row.distance_km
-                    ),
+                    float(row.distance_km),
                     3,
                 ),
 
@@ -906,7 +837,6 @@ def risk_history(
             "model":
                 row.model,
         })
-
 
     return {
 
@@ -934,21 +864,15 @@ def risk_points(
 ):
 
     rows = (
-
         db.query(
             RiskPrediction
         )
-
         .order_by(
             RiskPrediction.created_at.desc()
         )
-
         .limit(500)
-
         .all()
-
     )
-
 
     return [
 
@@ -982,7 +906,6 @@ def risk_points(
         }
 
         for row in rows
-
     ]
 
 
@@ -1004,15 +927,9 @@ def latest_risk(
     if radius_km <= 0:
 
         raise HTTPException(
-
             status_code=400,
-
-            detail=(
-                "radius_km must be "
-                "greater than 0."
-            ),
+            detail="radius_km must be greater than 0.",
         )
-
 
     query = text(
         """
@@ -1023,18 +940,7 @@ def latest_risk(
             prediction,
             risk_level,
             model,
-            created_at,
-
-            ST_Distance(
-                location,
-                ST_SetSRID(
-                    ST_MakePoint(
-                        :longitude,
-                        :latitude
-                    ),
-                    4326
-                )::geography
-            ) / 1000 AS distance_km
+            created_at
 
         FROM risk_predictions
 
@@ -1057,11 +963,8 @@ def latest_risk(
         """
     )
 
-
     result = db.execute(
-
         query,
-
         {
             "latitude":
                 latitude,
@@ -1074,13 +977,7 @@ def latest_risk(
         },
     )
 
-
     row = result.fetchone()
-
-
-    # --------------------------------------------------------
-    # NO PREDICTION
-    # --------------------------------------------------------
 
     if row is None:
 
@@ -1107,7 +1004,6 @@ def latest_risk(
             "created_at":
                 "",
         }
-
 
     return {
 
@@ -1137,58 +1033,27 @@ def latest_risk(
 
 
 # ============================================================
-# LIVE SATELLITE PREDICTION
+# LIVE SATELLITE PREDICTION + AUTOMATIC ALERT
 # ============================================================
 
 @app.post("/live-predict")
 async def live_predict(
     request: LocalRiskRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
 
-    print()
-    print("=" * 60)
-    print("LIVE PREDICTION REQUEST")
-    print("=" * 60)
-
-    print(
-        "Latitude:",
+    logger.info(
+        "LIVE PREDICTION %.6f, %.6f",
         request.latitude,
-    )
-
-    print(
-        "Longitude:",
         request.longitude,
     )
 
-    print(
-        "Radius:",
-        request.radius_km,
-        "km",
-    )
-
-
     try:
-
-        # ----------------------------------------------------
-        # LIVE PIPELINE
-        #
-        # Earth Engine
-        #       ↓
-        # live_predictor
-        #       ↓
-        # SVM
-        #       ↓
-        # PostgreSQL
-        #
-        # run_live_prediction() already saves the
-        # RiskPrediction record.
-        # ----------------------------------------------------
 
         result = await asyncio.wait_for(
 
             asyncio.to_thread(
-
                 run_live_prediction,
 
                 request.latitude,
@@ -1198,10 +1063,8 @@ async def live_predict(
                 db,
             ),
 
-            timeout=
-                LIVE_PREDICTION_TIMEOUT,
+            timeout=LIVE_PREDICTION_TIMEOUT,
         )
-
 
         if not result:
 
@@ -1209,65 +1072,46 @@ async def live_predict(
                 "Live prediction returned no result."
             )
 
-
-        # ----------------------------------------------------
-        # RESULT
-        # ----------------------------------------------------
-
         probability = float(
-
-            result[
-                "landslide_probability"
-            ]
-
+            result["landslide_probability"]
         )
-
 
         prediction_value = int(
-
-            result[
-                "prediction"
-            ]
-
+            result["prediction"]
         )
 
-
         risk_level = str(
-
             result.get(
-
                 "risk_level",
-
                 get_risk_level(
                     probability
                 ),
             )
-
         )
-
 
         model_name = str(
-
             result.get(
-
                 "model",
-
                 "SVM RBF",
             )
-
         )
 
+        alert_required = is_alert(
+            probability
+        )
 
-        # ----------------------------------------------------
-        # RESPONSE
-        # ----------------------------------------------------
+        message = get_alert_message(
+            risk_level
+        )
+
+        action = get_recommended_action(
+            risk_level
+        )
 
         response = {
 
             "id":
-                result.get(
-                    "id"
-                ),
+                result.get("id"),
 
             "latitude":
                 request.latitude,
@@ -1288,116 +1132,94 @@ async def live_predict(
                 model_name,
 
             "alert":
-                is_alert(
-                    probability
-                ),
+                alert_required,
 
             "message":
-                get_alert_message(
-                    risk_level
-                ),
+                message,
 
             "recommended_action":
-                get_recommended_action(
-                    risk_level
-                ),
+                action,
 
             "created_at":
-                result.get(
-                    "created_at"
-                ),
+                result.get("created_at"),
+
+            "alert_status":
+                "QUEUED"
+                if alert_required
+                else "NOT_REQUIRED",
         }
 
+        # ====================================================
+        # AUTOMATIC ALERT DISPATCH
+        # ====================================================
 
-        print()
-        print(
-            "LIVE PREDICTION SUCCESS"
-        )
+        if alert_required:
 
-        print(
-            "Probability:",
+            background_tasks.add_task(
+
+                dispatch_alert,
+
+                alert_type="LOCATION",
+
+                level=risk_level,
+
+                title=(
+                    f"{risk_level} Landslide Warning"
+                ),
+
+                message=message,
+
+                latitude=request.latitude,
+
+                longitude=request.longitude,
+
+                probability=probability,
+
+                prediction_id=result.get(
+                    "id"
+                ),
+
+                road_name=None,
+            )
+
+        logger.info(
+            "LIVE PREDICTION SUCCESS | probability=%.4f | risk=%s",
             probability,
-        )
-
-        print(
-            "Prediction:",
-            prediction_value,
-        )
-
-        print(
-            "Risk:",
             risk_level,
         )
 
-        print(
-            "Model:",
-            model_name,
-        )
-
-        print("=" * 60)
-
-
         return response
-
 
     except asyncio.TimeoutError:
 
         try:
-
             db.rollback()
-
         except Exception:
-
             pass
 
-
-        print(
-            "LIVE PREDICTION TIMEOUT"
-        )
-
-
         raise HTTPException(
-
             status_code=504,
-
             detail=(
                 "Live satellite prediction "
-                "timed out after "
-                f"{LIVE_PREDICTION_TIMEOUT} seconds."
+                f"timed out after {LIVE_PREDICTION_TIMEOUT} seconds."
             ),
         )
-
 
     except Exception as exc:
 
         try:
-
             db.rollback()
-
         except Exception:
-
             pass
 
-
-        print()
-        print("=" * 60)
-        print("LIVE PREDICTION ERROR")
-        print("=" * 60)
-
-        print(
-            repr(exc)
+        logger.exception(
+            "Live prediction failed"
         )
 
-        print("=" * 60)
-
-
         raise HTTPException(
-
             status_code=500,
-
             detail=(
-                "Live satellite prediction "
-                "failed: "
+                "Live satellite prediction failed: "
                 + str(exc)
             ),
         )
@@ -1414,54 +1236,51 @@ def weather(
 
     try:
 
-        result = get_weather(
-
+        return get_weather(
             request.latitude,
-
             request.longitude,
         )
-
-        return result
-
 
     except Exception as exc:
 
         raise HTTPException(
-
             status_code=502,
-
             detail=str(exc),
         )
 
 
 # ============================================================
-# STARTUP MESSAGE
+# STARTUP LOGGING
 # ============================================================
 
-print(
-    "=" * 60
+logger.info(
+    "============================================================"
 )
 
-print(
+logger.info(
     "SIH LANDSLIDE RISK MONITORING API"
 )
 
-print(
+logger.info(
     "API INITIALIZED SUCCESSFULLY"
 )
 
-print(
-    "VULNERABLE ROADS ROUTE ENABLED"
+logger.info(
+    "VULNERABLE ROADS ENABLED"
 )
 
-print(
+logger.info(
     "LIVE SATELLITE PREDICTION ENABLED"
 )
 
-print(
-    "WEATHER ROUTE ENABLED"
+logger.info(
+    "WEATHER ENABLED"
 )
 
-print(
-    "=" * 60
+logger.info(
+    "AUTOMATIC ALERT SYSTEM ENABLED"
+)
+
+logger.info(
+    "============================================================"
 )

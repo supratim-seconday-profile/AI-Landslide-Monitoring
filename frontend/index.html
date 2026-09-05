@@ -34,6 +34,21 @@
         href="style.css"
     >
 
+    <meta
+    name="theme-color"
+    content="#0f172a"
+>
+
+<meta
+    name="description"
+    content="AI-based landslide early warning and risk monitoring system for North Eastern India."
+>
+
+<link
+    rel="manifest"
+    href="manifest.json"
+>
+
 </head>
 
 
@@ -224,7 +239,430 @@
     </section>
 
 
+    <!-- =========================================================
+     ALERT & NOTIFICATION CENTER
+========================================================= -->
 
+<section class="panel alert-center-panel" id="alert-center">
+
+    <div class="section-heading-row">
+
+        <div>
+
+            <h2>
+                🚨 Alert & Notification Center
+            </h2>
+
+            <p class="section-description">
+                Configure location-based emergency alerts for
+                authorities, field officers and nearby communities.
+            </p>
+
+        </div>
+
+        <span
+            id="alert-system-status"
+            class="alert-system-status online"
+        >
+            ● ALERT SYSTEM ONLINE
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         ALERT SYSTEM STATUS CARDS
+    ====================================================== -->
+
+    <div class="alert-center-grid">
+
+        <div class="alert-control-card">
+
+            <div class="alert-control-icon">
+                📍
+            </div>
+
+            <div>
+
+                <span>
+                    Monitoring Location
+                </span>
+
+                <strong id="alert-monitor-location">
+                    Current map location
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="alert-control-card">
+
+            <div class="alert-control-icon">
+                📡
+            </div>
+
+            <div>
+
+                <span>
+                    Detection
+                </span>
+
+                <strong>
+                    Automatic
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="alert-control-card">
+
+            <div class="alert-control-icon">
+                📱
+            </div>
+
+            <div>
+
+                <span>
+                    SMS Alerts
+                </span>
+
+                <strong id="sms-status">
+                    Not configured
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="alert-control-card">
+
+            <div class="alert-control-icon">
+                🔔
+            </div>
+
+            <div>
+
+                <span>
+                    Browser Push
+                </span>
+
+                <strong id="push-status">
+                    Not enabled
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         NOTIFICATION CONFIGURATION
+    ====================================================== -->
+
+    <div class="alert-configuration">
+
+        <div class="alert-config-header">
+
+            <div>
+
+                <h3>
+                    📲 Community Alert Subscription
+                </h3>
+
+                <p>
+                    Register an authority, field officer or
+                    community contact to receive alerts when
+                    high-risk conditions are detected nearby.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="alert-form-grid">
+
+            <label>
+
+                Name
+
+                <input
+                    id="alert-subscriber-name"
+                    type="text"
+                    placeholder="District Control Room"
+                    maxlength="120"
+                >
+
+            </label>
+
+
+            <label>
+
+                Mobile Number
+
+                <input
+                    id="alert-subscriber-phone"
+                    type="tel"
+                    placeholder="+91XXXXXXXXXX"
+                    maxlength="32"
+                >
+
+            </label>
+
+
+            <label>
+
+                Alert Radius
+
+                <select
+                    id="alert-radius"
+                >
+
+                    <option value="2">
+                        2 km
+                    </option>
+
+                    <option value="5" selected>
+                        5 km
+                    </option>
+
+                    <option value="10">
+                        10 km
+                    </option>
+
+                    <option value="20">
+                        20 km
+                    </option>
+
+                    <option value="50">
+                        50 km
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label>
+
+                Location
+
+                <input
+                    id="alert-subscriber-location"
+                    type="text"
+                    value="Current map location"
+                    readonly
+                >
+
+            </label>
+
+        </div>
+
+
+        <!-- =================================================
+             CHANNEL TOGGLES
+        ================================================== -->
+
+        <div class="alert-channel-row">
+
+            <label class="alert-toggle">
+
+                <input
+                    id="enable-subscriber-sms"
+                    type="checkbox"
+                    checked
+                >
+
+                <span>
+                    📱 Receive SMS alerts
+                </span>
+
+            </label>
+
+
+            <label class="alert-toggle">
+
+                <input
+                    id="enable-subscriber-push"
+                    type="checkbox"
+                    checked
+                >
+
+                <span>
+                    🔔 Receive browser notifications
+                </span>
+
+            </label>
+
+        </div>
+
+
+        <div class="alert-action-row">
+
+            <button
+                id="register-alert-subscriber"
+                class="primary-button alert-register-button"
+                type="button"
+            >
+                🚨 Register for Emergency Alerts
+            </button>
+
+
+            <button
+                id="enable-push-alerts"
+                class="secondary-button alert-push-button"
+                type="button"
+            >
+                🔔 Enable Push Notifications
+            </button>
+
+        </div>
+
+
+        <div
+            id="alert-registration-status"
+            class="alert-registration-status"
+        >
+            Select your location on the map and register
+            to receive nearby risk alerts.
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         OFFLINE ALERT STATUS
+    ====================================================== -->
+
+    <div
+        id="offline-alert-panel"
+        class="offline-alert-panel"
+    >
+
+        <div class="offline-alert-icon">
+            📡
+        </div>
+
+        <div>
+
+            <strong id="offline-alert-title">
+                Connectivity Monitoring Active
+            </strong>
+
+            <p id="offline-alert-message">
+                The system will retain the last known risk
+                state if network connectivity is interrupted.
+            </p>
+
+        </div>
+
+        <span
+            id="offline-alert-badge"
+            class="offline-alert-badge online"
+        >
+            ONLINE
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         ALERT DELIVERY STATUS
+    ====================================================== -->
+
+    <div class="alert-delivery-summary">
+
+        <div>
+
+            <span>
+                Last Alert
+            </span>
+
+            <strong id="last-alert-time">
+                No alerts yet
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                SMS Deliveries
+            </span>
+
+            <strong id="sms-delivery-count">
+                0
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Push Deliveries
+            </span>
+
+            <strong id="push-delivery-count">
+                0
+            </strong>
+
+        </div>
+
+
+        <div>
+
+            <span>
+                Active Warnings
+            </span>
+
+            <strong id="center-warning-count">
+                0
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         DEMO / TEST ALERT
+    ====================================================== -->
+
+    <div class="alert-test-area">
+
+        <div>
+
+            <strong>
+                SIH Demonstration
+            </strong>
+
+            <p>
+                Send a test alert to verify the notification
+                pipeline before the final demonstration.
+            </p>
+
+        </div>
+
+        <button
+            id="test-critical-alert"
+            class="danger-button"
+            type="button"
+        >
+            🚨 Test Critical Alert
+        </button>
+
+    </div>
+
+</section>
     <!-- =====================================================
          LOCAL ALERTS
     ====================================================== -->
@@ -742,7 +1180,9 @@
 
 <script src="app.js"></script>
 
+<script src="final_alert_runtime.js"></script>
+
 
 </body>
 
-</html>
+</html>>

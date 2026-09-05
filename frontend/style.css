@@ -3683,3 +3683,1001 @@ body {
     }
 
 }
+
+/* ============================================================
+   FINAL SIH ALERT RUNTIME
+   ============================================================ */
+
+.network-status {
+
+    position:
+        fixed;
+
+    right:
+        18px;
+
+    bottom:
+        18px;
+
+    z-index:
+        9999;
+
+    padding:
+        8px 13px;
+
+    border-radius:
+        999px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid #e2e8f0;
+
+    box-shadow:
+        0 4px 16px rgba(
+            15,
+            23,
+            42,
+            .14
+        );
+
+    font-size:
+        11px;
+
+    font-weight:
+        800;
+
+}
+
+
+.network-status.online {
+
+    color:
+        #166534;
+
+    border-color:
+        #bbf7d0;
+
+    background:
+        #f0fdf4;
+
+}
+
+
+.network-status.offline {
+
+    color:
+        #991b1b;
+
+    border-color:
+        #fecaca;
+
+    background:
+        #fef2f2;
+
+}
+
+
+.global-alert-banner {
+
+    position:
+        relative;
+
+    margin:
+        14px 24px;
+
+    padding:
+        14px 18px;
+
+    display:
+        flex;
+
+    gap:
+        12px;
+
+    align-items:
+        flex-start;
+
+    border:
+        1px solid #fecaca;
+
+    border-radius:
+        12px;
+
+}
+
+
+.global-alert-banner.hidden {
+
+    display:
+        none;
+
+}
+
+
+.global-alert-banner.high {
+
+    background:
+        #fef2f2;
+
+    color:
+        #991b1b;
+
+}
+
+
+.global-alert-banner.critical {
+
+    background:
+        #fee2e2;
+
+    color:
+        #7f1d1d;
+
+}
+
+
+.global-alert-banner.medium {
+
+    background:
+        #fffbeb;
+
+    color:
+        #92400e;
+
+}
+
+
+.global-alert-icon {
+
+    font-size:
+        23px;
+
+}
+
+
+#global-alert-title {
+
+    display:
+        block;
+
+    font-size:
+        14px;
+
+    font-weight:
+        900;
+
+}
+
+
+#global-alert-message {
+
+    margin:
+        4px 0 0;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.55;
+
+}
+
+/* ============================================================
+   ALERT & NOTIFICATION CENTER
+============================================================ */
+
+.alert-center-panel {
+
+    border:
+        1px solid #fecaca;
+
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff 0%,
+            #fffafa 100%
+        );
+
+}
+
+
+.alert-system-status {
+
+    padding:
+        7px 11px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        10px;
+
+    font-weight:
+        900;
+
+    letter-spacing:
+        .04em;
+
+}
+
+
+.alert-system-status.online {
+
+    color:
+        #166534;
+
+    background:
+        #dcfce7;
+
+    border:
+        1px solid #bbf7d0;
+
+}
+
+
+.alert-system-status.offline {
+
+    color:
+        #991b1b;
+
+    background:
+        #fee2e2;
+
+    border:
+        1px solid #fecaca;
+
+}
+
+
+/* ============================================================
+   ALERT STATUS GRID
+============================================================ */
+
+.alert-center-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap:
+        10px;
+
+    margin-top:
+        14px;
+
+}
+
+
+.alert-control-card {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    padding:
+        12px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        10px;
+
+    background:
+        #ffffff;
+
+}
+
+
+.alert-control-icon {
+
+    width:
+        36px;
+
+    height:
+        36px;
+
+    flex-shrink:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        9px;
+
+    background:
+        #fef2f2;
+
+    font-size:
+        18px;
+
+}
+
+
+.alert-control-card span {
+
+    display:
+        block;
+
+    color:
+        #64748b;
+
+    font-size:
+        9px;
+
+    font-weight:
+        700;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+.alert-control-card strong {
+
+    display:
+        block;
+
+    margin-top:
+        3px;
+
+    color:
+        #0f172a;
+
+    font-size:
+        12px;
+
+}
+
+
+/* ============================================================
+   ALERT CONFIGURATION
+============================================================ */
+
+.alert-configuration {
+
+    margin-top:
+        16px;
+
+    padding:
+        16px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        12px;
+
+    background:
+        #f8fafc;
+
+}
+
+
+.alert-config-header h3 {
+
+    margin:
+        0;
+
+    font-size:
+        14px;
+
+    color:
+        #0f172a;
+
+}
+
+
+.alert-config-header p {
+
+    margin:
+        5px 0 0;
+
+    color:
+        #64748b;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.6;
+
+}
+
+
+.alert-form-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap:
+        10px;
+
+    margin-top:
+        14px;
+
+}
+
+
+.alert-form-grid label {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        5px;
+
+    color:
+        #475569;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+}
+
+
+.alert-form-grid input,
+.alert-form-grid select {
+
+    width:
+        100%;
+
+    min-height:
+        38px;
+
+    padding:
+        0 10px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    color:
+        #0f172a;
+
+    font-size:
+        11px;
+
+    outline:
+        none;
+
+    box-sizing:
+        border-box;
+
+}
+
+
+.alert-form-grid input:focus,
+.alert-form-grid select:focus {
+
+    border-color:
+        #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            37,
+            99,
+            235,
+            .08
+        );
+
+}
+
+
+/* ============================================================
+   CHANNELS
+============================================================ */
+
+.alert-channel-row {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        18px;
+
+    margin-top:
+        14px;
+
+}
+
+
+.alert-toggle {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        #334155;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+}
+
+
+.alert-toggle input {
+
+    width:
+        16px;
+
+    height:
+        16px;
+
+    accent-color:
+        #dc2626;
+
+}
+
+
+/* ============================================================
+   ALERT ACTIONS
+============================================================ */
+
+.alert-action-row {
+
+    display:
+        flex;
+
+    gap:
+        9px;
+
+    margin-top:
+        14px;
+
+}
+
+
+.alert-register-button {
+
+    flex:
+        1;
+
+}
+
+
+.alert-push-button {
+
+    min-width:
+        220px;
+
+}
+
+
+.alert-registration-status {
+
+    margin-top:
+        10px;
+
+    padding:
+        9px 11px;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px solid #e2e8f0;
+
+    color:
+        #64748b;
+
+    font-size:
+        10px;
+
+}
+
+
+/* ============================================================
+   OFFLINE ALERT
+============================================================ */
+
+.offline-alert-panel {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    margin-top:
+        12px;
+
+    padding:
+        12px;
+
+    border:
+        1px solid #bfdbfe;
+
+    border-radius:
+        10px;
+
+    background:
+        #eff6ff;
+
+}
+
+
+.offline-alert-icon {
+
+    font-size:
+        22px;
+
+}
+
+
+.offline-alert-panel strong {
+
+    display:
+        block;
+
+    color:
+        #1e3a8a;
+
+    font-size:
+        12px;
+
+}
+
+
+.offline-alert-panel p {
+
+    margin:
+        3px 0 0;
+
+    color:
+        #475569;
+
+    font-size:
+        10px;
+
+}
+
+
+.offline-alert-badge {
+
+    margin-left:
+        auto;
+
+    padding:
+        5px 9px;
+
+    border-radius:
+        999px;
+
+    font-size:
+        9px;
+
+    font-weight:
+        900;
+
+}
+
+
+.offline-alert-badge.online {
+
+    color:
+        #166534;
+
+    background:
+        #dcfce7;
+
+}
+
+
+.offline-alert-badge.offline {
+
+    color:
+        #991b1b;
+
+    background:
+        #fee2e2;
+
+}
+
+
+/* ============================================================
+   DELIVERY SUMMARY
+============================================================ */
+
+.alert-delivery-summary {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap:
+        10px;
+
+    margin-top:
+        12px;
+
+}
+
+
+.alert-delivery-summary > div {
+
+    padding:
+        11px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius:
+        9px;
+
+    background:
+        #ffffff;
+
+}
+
+
+.alert-delivery-summary span {
+
+    display:
+        block;
+
+    color:
+        #64748b;
+
+    font-size:
+        9px;
+
+    font-weight:
+        700;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+.alert-delivery-summary strong {
+
+    display:
+        block;
+
+    margin-top:
+        4px;
+
+    color:
+        #0f172a;
+
+    font-size:
+        13px;
+
+}
+
+
+/* ============================================================
+   TEST ALERT
+============================================================ */
+
+.alert-test-area {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    margin-top:
+        12px;
+
+    padding:
+        12px;
+
+    border:
+        1px dashed #fca5a5;
+
+    border-radius:
+        10px;
+
+    background:
+        #fff7f7;
+
+}
+
+
+.alert-test-area strong {
+
+    color:
+        #7f1d1d;
+
+    font-size:
+        11px;
+
+}
+
+
+.alert-test-area p {
+
+    margin:
+        3px 0 0;
+
+    color:
+        #64748b;
+
+    font-size:
+        10px;
+
+}
+
+
+.danger-button {
+
+    min-height:
+        36px;
+
+    padding:
+        0 13px;
+
+    border:
+        0;
+
+    border-radius:
+        8px;
+
+    background:
+        #dc2626;
+
+    color:
+        #ffffff;
+
+    cursor:
+        pointer;
+
+    font-size:
+        10px;
+
+    font-weight:
+        800;
+
+}
+
+
+.danger-button:hover {
+
+    background:
+        #b91c1c;
+
+}
+
+
+/* ============================================================
+   RESPONSIVE ALERT CENTER
+============================================================ */
+
+@media (max-width: 900px) {
+
+    .alert-center-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+    .alert-form-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+    .alert-delivery-summary {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+
+    }
+
+}
+
+
+@media (max-width: 560px) {
+
+    .alert-center-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .alert-form-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .alert-action-row {
+
+        flex-direction:
+            column;
+
+    }
+
+    .alert-push-button {
+
+        width:
+            100%;
+
+    }
+
+    .alert-test-area {
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+    }
+
+    .alert-delivery-summary {
+
+        grid-template-columns:
+            1fr 1fr;
+
+    }
+
+}
