@@ -12,7 +12,7 @@
 
 const ALERT_API =
     window.API_BASE_URL ||
-    "http://127.0.0.1:8000";
+    "https://ai-landslide-monitoring-pk5y.onrender.com";
 
 
 const ALERT_SUBSCRIBER_STORAGE_KEY =

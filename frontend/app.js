@@ -47,8 +47,8 @@
 /* ============================================================
    CONFIGURATION
    ============================================================ */
+const API_BASE_URL = "https://ai-landslide-monitoring-pk5y.onrender.com";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
 
 const DEFAULT_LATITUDE = 27.338;
 const DEFAULT_LONGITUDE = 88.606;
