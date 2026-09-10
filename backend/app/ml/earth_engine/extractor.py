@@ -1,11 +1,50 @@
+import os
+import json
+
 import ee
+from google.oauth2 import service_account
 
 
 # ============================================================
 # GOOGLE EARTH ENGINE INITIALIZATION
 # ============================================================
 
-ee.Initialize(project="landslide-ne")
+credentials_json = os.getenv(
+    "GOOGLE_APPLICATION_CREDENTIALS_JSON"
+)
+
+if credentials_json:
+    # --------------------------------------------------------
+    # RENDER / SERVER DEPLOYMENT
+    # Credentials are supplied through an environment variable.
+    # --------------------------------------------------------
+
+    credentials_info = json.loads(credentials_json)
+
+    credentials = (
+        service_account.Credentials.from_service_account_info(
+            credentials_info,
+            scopes=[
+                "https://www.googleapis.com/auth/earthengine"
+            ]
+        )
+    )
+
+    ee.Initialize(
+        credentials=credentials,
+        project="landslide-ne"
+    )
+
+else:
+    # --------------------------------------------------------
+    # LOCAL DEVELOPMENT
+    # Uses GOOGLE_APPLICATION_CREDENTIALS pointing to the
+    # local service-account JSON file.
+    # --------------------------------------------------------
+
+    ee.Initialize(
+        project="landslide-ne"
+    )
 
 
 # ============================================================
