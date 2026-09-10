@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Command Center | NER Early Warning</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="style.css">
+    <meta name="theme-color" content="#0b1724">
+    <style>
+        /* RESET ANY INHERITED GRID-AREA OVERRIDES FROM STYLE.CSS */
+        .oc-console-body * {
+            grid-area: auto !important;
+            box-sizing: border-box;
+        }
+
+        .oc-console-body {
+            max-width: 1560px;
+            margin: 0 auto;
+            padding: 16px 24px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* ROW 1: SATELLITE MAP (LEFT) + SECTOR DIAGNOSTICS (RIGHT) */
+        .oc-primary-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.65fr) minmax(380px, 1fr);
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .oc-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 18px 20px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+        }
+
+        .oc-map-box {
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            overflow: hidden;
+            min-height: 560px;
+            position: relative;
+        }
+
+        .oc-map-box .panel-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .oc-map-box #map {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            flex: 1;
+        }
+
+        .oc-side-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .oc-side-column h2 {
+            margin: 0 0 12px;
+            font-size: 16px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ROW 2: BROADCAST STATION & HISTORICAL REGRESSION */
+        .oc-secondary-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 1fr;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .oc-secondary-grid h2 {
+            margin: 0 0 4px;
+            font-size: 17px;
+            color: #0f172a;
+        }
+
+        .oc-form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 14px 0;
+        }
+
+        .oc-form-grid label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .oc-form-grid input,
+        .oc-form-grid select {
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 12px;
+            background: #fff;
+        }
+
+        .oc-btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .oc-btn-row button {
+            flex: 1;
+            height: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .oc-history-chart-wrapper {
+            position: relative;
+            height: 270px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        /* ROW 3: VULNERABLE ROADS WRAPPER */
+        .oc-roads-container {
+            width: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .oc-primary-grid,
+            .oc-secondary-grid {
+                grid-template-columns: 1fr;
+            }
+            .oc-map-box {
+                min-height: 450px;
+            }
+        }
+    </style>
+</head>
+<body class="official-view">
+
+<!-- AUTH MODAL -->
+<div id="auth-modal" class="auth-modal-overlay">
+    <div class="auth-modal-card">
+        <div class="auth-modal-header">
+            <span class="auth-badge">OFFICIAL USE ONLY</span>
+            <h2>Department Authorization</h2>
+            <p>Access restricted to emergency operation officers and district collectors.</p>
+        </div>
+        <form id="official-login-form" class="auth-form" onsubmit="handleOfficialLogin(event)">
+            <label>
+                Officer ID / Username
+                <input type="text" id="auth-username" placeholder="e.g. officer@ner.gov.in" required autocomplete="username">
+            </label>
+            <label>
+                Security Key / Password
+                <input type="password" id="auth-password" placeholder="••••••••••••" required autocomplete="current-password">
+            </label>
+            <div id="auth-error-msg" class="auth-error hidden">Invalid credentials. Please re-check.</div>
+            <button type="submit" class="primary-button">Authenticate & Enter Console</button>
+            <a href="index.html" class="auth-back-link">← Return to Public Advisory</a>
+        </form>
+    </div>
+</div>
+
+<!-- SECURE CONSOLE WRAPPER -->
+<div id="console-wrapper" class="console-wrapper hidden">
+    <!-- HEADER -->
+    <header class="header official-header">
+        <div class="header-content">
+            <span class="system-label" style="color: #f87171;">COMMAND & CONTROL CONSOLE</span>
+            <h1>NER Landslide Incident Center</h1>
+            <p id="officer-badge">Authorized Officer: Session Verified</p>
+        </div>
+        <div class="header-right">
+            <div class="live-status">
+                <span class="live-dot" style="background: #38bdf8;"></span> SECURE SESSION
+            </div>
+            <button onclick="handleLogout()" class="logout-btn">Log Out</button>
+        </div>
+    </header>
+
+    <!-- KEY STATS -->
+    <section class="stats-container">
+        <div class="stat-card">
+            <div class="stat-icon risk-icon">⚠️</div>
+            <div class="stat-content">
+                <h3>Selected Risk</h3>
+                <div id="current-risk" class="stat-value">--</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon count-icon">🔴</div>
+            <div class="stat-content">
+                <h3>Highest Sector Risk</h3>
+                <div id="highest-risk" class="stat-value">--</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon nearby-icon">📡</div>
+            <div class="stat-content">
+                <h3>Nearby Risks</h3>
+                <div id="nearby-count" class="stat-value">--</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon update-icon">🕒</div>
+            <div class="stat-content">
+                <h3>System Synced</h3>
+                <div id="last-updated" class="stat-value small">--</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN CONSOLE LAYOUT -->
+    <main class="oc-console-body">
+        
+        <!-- SECTION 1: MAP + TARGET SECTOR TELEMETRY -->
+        <div class="oc-primary-grid">
+            <!-- LEAFLET SATELLITE MAP -->
+            <section class="oc-card oc-map-box">
+                <div class="panel-header">
+                    <div>
+                        <strong style="font-size: 15px; color: #0f172a;">Live Satellite Tracking Grid</strong>
+                        <div style="font-size: 12px; color: #64748b;">Interactive GEE satellite analysis layer</div>
+                    </div>
+                    <span class="satellite-badge">5 km Sensor Radius</span>
+                </div>
+                <div id="map-status" class="map-status">Initializing sensors...</div>
+                <div id="map"></div>
+            </section>
+
+            <!-- RIGHT CONTROL SIDEBAR -->
+            <aside class="oc-side-column">
+                <!-- LOCATION INSPECTION & PIPELINE TRIGGER -->
+                <div class="oc-card">
+                    <h2>📍 Selected Sector Coordinates</h2>
+                    <div id="location" class="location-details">Click the map to select target coordinates.</div>
+                    <button id="analyze-button" class="primary-button" type="button" style="margin-top: 10px;">Analyze Live Risk</button>
+                    <div id="analysis-status" class="analysis-status">Ready for satellite evaluation.</div>
+                </div>
+
+                <!-- LIVE PREDICTION EVALUATION -->
+                <div class="oc-card">
+                    <h2>⚠️ Risk Details</h2>
+                    <div id="risk" style="font-size: 13px; line-height: 1.6; color: #475569;">
+                        No prediction available. Click on the map and select "Analyze Live Risk".
+                    </div>
+                </div>
+
+                <!-- MODEL TELEMETRY -->
+                <div class="oc-card">
+                    <h2>🤖 Model Diagnostics</h2>
+                    <div class="prediction-info-grid" style="margin-bottom: 0;">
+                        <div class="prediction-info-card"><span>Model</span><strong id="prediction-model">SVM RBF</strong></div>
+                        <div class="prediction-info-card"><span>Engine</span><strong>GEE Live</strong></div>
+                        <div class="prediction-info-card"><span>Features</span><strong>16 Bands</strong></div>
+                        <div class="prediction-info-card"><span>Buffer</span><strong>5 km</strong></div>
+                    </div>
+                    <div id="prediction-result" class="prediction-result" style="margin-top: 10px;">Inference pipeline ready.</div>
+                </div>
+            </aside>
+        </div>
+
+        <!-- SECTION 2: BROADCAST STATION & HISTORICAL REGRESSION -->
+        <div class="oc-secondary-grid">
+            <!-- DISPATCH MANAGEMENT -->
+            <section class="oc-card" id="alert-center">
+                <div class="section-heading-row">
+                    <div>
+                        <h2>🚨 Emergency Alert & Broadcast Center</h2>
+                        <p class="section-description">Deploy broadcast warnings to rapid response teams and field units.</p>
+                    </div>
+                    <span id="alert-system-status" class="alert-system-status online">● READY</span>
+                </div>
+
+                <div class="alert-configuration" style="margin-top: 12px; padding: 14px;">
+                    <div class="oc-form-grid">
+                        <label>
+                            Unit / Contact Name
+                            <input id="alert-subscriber-name" type="text" placeholder="Field Control Desk">
+                        </label>
+                        <label>
+                            Mobile Number
+                            <input id="alert-subscriber-phone" type="tel" placeholder="+91XXXXXXXXXX">
+                        </label>
+                        <label>
+                            Radius
+                            <select id="alert-radius">
+                                <option value="2">2 km</option>
+                                <option value="5" selected>5 km</option>
+                                <option value="15">15 km</option>
+                            </select>
+                        </label>
+                        <label>
+                            Target Coordinates
+                            <input id="alert-subscriber-location" type="text" readonly>
+                        </label>
+                    </div>
+
+                    <div class="alert-channel-row" style="margin-top: 6px;">
+                        <label class="alert-toggle">
+                            <input id="enable-subscriber-sms" type="checkbox" checked>
+                            <span>SMS Alerts</span>
+                        </label>
+                        <label class="alert-toggle">
+                            <input id="enable-subscriber-push" type="checkbox" checked>
+                            <span>Push Notifications</span>
+                        </label>
+                    </div>
+
+                    <div class="oc-btn-row">
+                        <button id="register-alert-subscriber" class="primary-button" type="button">Register Recipient</button>
+                        <button id="enable-push-alerts" class="secondary-button" type="button">Enable Browser Push</button>
+                    </div>
+                    <div id="alert-registration-status" class="alert-registration-status" style="margin-top: 10px;">Select coordinates to link response units.</div>
+                </div>
+
+                <div class="alert-test-area" style="margin-top: 12px; padding: 12px;">
+                    <div>
+                        <strong style="font-size: 12px; color: #7f1d1d;">Manual Critical Broadcast</strong>
+                        <p style="margin: 2px 0 0; font-size: 11px; color: #64748b;">Simulate instant emergency broadcast pipeline to registered units.</p>
+                    </div>
+                    <button id="test-critical-alert" class="danger-button" type="button" style="white-space: nowrap;">🚨 Test Critical Alert</button>
+                </div>
+            </section>
+
+            <!-- RISK REGRESSION / HISTORY CHART -->
+            <section class="oc-card history-panel">
+                <div class="section-heading-row">
+                    <div>
+                        <h2>📈 Risk Probability History</h2>
+                        <p class="section-description">Historical prediction regression for current sector.</p>
+                    </div>
+                </div>
+                <div id="history" class="history-content">
+                    <div class="oc-history-chart-wrapper">
+                        <canvas id="riskHistoryChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- SECTION 3: VULNERABLE ROADS (FULL WIDTH ACCENT PANEL) -->
+        <section class="oc-card oc-roads-container" id="vulnerable-roads-panel">
+            <div class="section-heading-row">
+                <div>
+                    <h2>🛣️ Vulnerable Roads Exposure</h2>
+                    <p class="section-description">Infrastructure sectors exposed to active slope instability.</p>
+                </div>
+                <div id="road-count" class="section-count">0</div>
+            </div>
+            <div id="road-status" class="road-status">Run live analysis to compute road exposure.</div>
+            <div id="road-summary" class="road-summary"></div>
+            <div id="road-list" class="road-list"></div>
+        </section>
+
+        <!-- HIDDEN BACKEND SYNC CONTAINERS (Maintains script variable bindings) -->
+        <div style="display:none !important;" aria-hidden="true">
+            <div id="alerts"></div>
+            <div id="risk-zones"></div>
+            <span id="risk-zone-count">0</span>
+            <div id="weather-status"></div>
+            <div id="weather-content">
+                <span id="weather-temperature"></span>
+                <span id="weather-humidity"></span>
+                <span id="weather-current-rain"></span>
+                <span id="weather-wind"></span>
+                <span id="weather-rainfall-24"></span>
+                <span id="weather-rainfall-72"></span>
+                <div id="rainfall-alert"></div>
+            </div>
+            <span id="alert-monitor-location"></span>
+            <span id="sms-status"></span>
+            <span id="push-status"></span>
+            <span id="offline-alert-badge"></span>
+            <span id="offline-alert-title"></span>
+            <span id="offline-alert-message"></span>
+            <span id="last-alert-time"></span>
+            <span id="sms-delivery-count"></span>
+            <span id="push-delivery-count"></span>
+            <span id="center-warning-count"></span>
+            <span id="active-warning-count"></span>
+        </div>
+    </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+<script src="alert_center.js"></script>
+<script src="official_auth.js"></script>
+</body>
+</html>

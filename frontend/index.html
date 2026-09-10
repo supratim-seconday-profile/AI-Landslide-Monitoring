@@ -2,170 +2,213 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <title>Citizen Advisory | NER Landslide Monitoring</title>
 
-    <title>
-        NER Landslide Early Warning System
-    </title>
-
-
-    <!-- =====================================================
-         LEAFLET
-    ====================================================== -->
-
+    <!-- Leaflet -->
     <link
         rel="stylesheet"
         href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="style.css">
 
-    <!-- =====================================================
-         DASHBOARD CSS
-    ====================================================== -->
-
-    <link
-        rel="stylesheet"
-        href="style.css"
+    <meta
+        name="theme-color"
+        content="#0b1724"
     >
 
     <meta
-    name="theme-color"
-    content="#0f172a"
->
+        name="description"
+        content="Citizen landslide warning and hazard monitoring portal for North Eastern India."
+    >
 
-<meta
-    name="description"
-    content="AI-based landslide early warning and risk monitoring system for North Eastern India."
->
-
-<link
-    rel="manifest"
-    href="manifest.json"
->
-
+    <link
+        rel="manifest"
+        href="manifest.json"
+    >
 </head>
 
-
-<body>
-
+<body class="public-view">
 
 <!-- =========================================================
-     HEADER
+     PUBLIC HEADER
 ========================================================= -->
 
 <header class="header">
 
     <div class="header-content">
 
+        <span class="system-label">
+            PUBLIC ADVISORY & MONITORING
+        </span>
+
         <h1>
-            NER Landslide Early Warning System
+            NER Landslide Warning Portal
         </h1>
 
         <p>
-            AI-Based Risk Monitoring & Early Warning
+            Real-time citizen alerts and landslide hazard maps
+            for North Eastern India
         </p>
 
     </div>
 
+    <div class="header-right">
 
-    <div class="live-status">
+        <div class="live-status">
+            <span class="live-dot"></span>
+            LIVE ADVISORY
+        </div>
 
-        <span class="live-dot"></span>
-
-        LIVE
+        <a
+            href="official.html"
+            class="portal-switch-btn"
+        >
+            🔒 Official Login
+        </a>
 
     </div>
 
 </header>
 
 
-
 <!-- =========================================================
-     STATISTICS
+     QUICK RISK SUMMARY
 ========================================================= -->
 
 <section class="stats-container">
 
+    <!-- Current Risk -->
 
     <div class="stat-card">
 
-        <h3>
-            Current Risk
-        </h3>
+        <div class="stat-icon risk-icon">
+            ⚠️
+        </div>
 
-        <div
-            id="current-risk"
-            class="stat-value"
-        >
-            --
+        <div class="stat-content">
+
+            <h3>
+                Regional Risk Status
+            </h3>
+
+            <div
+                id="current-risk"
+                class="stat-value"
+            >
+                --
+            </div>
+
+            <span class="stat-description">
+                Based on nearest active sensors
+            </span>
+
         </div>
 
     </div>
 
 
+    <!-- Nearby Zones -->
+
     <div class="stat-card">
 
-        <h3>
-            Highest Nearby Risk
-        </h3>
+        <div class="stat-icon count-icon">
+            📍
+        </div>
 
-        <div
-            id="highest-risk"
-            class="stat-value"
-        >
-            --
+        <div class="stat-content">
+
+            <h3>
+                Nearby Monitored Zones
+            </h3>
+
+            <div
+                id="nearby-count"
+                class="stat-value"
+            >
+                --
+            </div>
+
+            <span class="stat-description">
+                Within 5 km radius
+            </span>
+
         </div>
 
     </div>
 
 
+    <!-- Rainfall -->
+
     <div class="stat-card">
 
-        <h3>
-            Nearby Risks
-        </h3>
+        <div class="stat-icon nearby-icon">
+            🌧️
+        </div>
 
-        <div
-            id="nearby-count"
-            class="stat-value"
-        >
-            --
+        <div class="stat-content">
+
+            <h3>
+                Rainfall Status
+            </h3>
+
+            <div
+                id="weather-rainfall-24"
+                class="stat-value"
+            >
+                -- mm
+            </div>
+
+            <span class="stat-description">
+                Past 24 hours
+            </span>
+
         </div>
 
     </div>
 
 
+    <!-- Updated -->
+
     <div class="stat-card">
 
-        <h3>
-            Last Updated
-        </h3>
+        <div class="stat-icon update-icon">
+            🕒
+        </div>
 
-        <div
-            id="last-updated"
-            class="stat-value small"
-        >
-            --
+        <div class="stat-content">
+
+            <h3>
+                Advisory Updated
+            </h3>
+
+            <div
+                id="last-updated"
+                class="stat-value small"
+            >
+                --
+            </div>
+
+            <span class="stat-description">
+                Live synced
+            </span>
+
         </div>
 
     </div>
-
 
 </section>
-
 
 
 <!-- =========================================================
      MAIN DASHBOARD
 ========================================================= -->
 
-<main class="dashboard">
+<main class="dashboard public-layout">
 
 
     <!-- =====================================================
@@ -179,14 +222,23 @@
             <div>
 
                 <h2>
-                    Local Landslide Risk Map
+                    Interactive Landslide Hazard Map
                 </h2>
+
+                <p class="panel-subtitle">
+                    Click anywhere to inspect local landslide
+                    probability and road safety status.
+                </p>
 
             </div>
 
-            <span>
-                5 km radius
-            </span>
+            <div class="map-header-controls">
+
+                <span class="satellite-badge">
+                    Sensing Radius: 5 km
+                </span>
+
+            </div>
 
         </div>
 
@@ -195,7 +247,7 @@
             id="map-status"
             class="map-status"
         >
-            Initializing live monitoring...
+            Click a location to inspect risk levels.
         </div>
 
 
@@ -239,498 +291,206 @@
     </section>
 
 
-    <!-- =========================================================
-     ALERT & NOTIFICATION CENTER
-========================================================= -->
-
-<section class="panel alert-center-panel" id="alert-center">
-
-    <div class="section-heading-row">
-
-        <div>
-
-            <h2>
-                🚨 Alert & Notification Center
-            </h2>
-
-            <p class="section-description">
-                Configure location-based emergency alerts for
-                authorities, field officers and nearby communities.
-            </p>
-
-        </div>
-
-        <span
-            id="alert-system-status"
-            class="alert-system-status online"
-        >
-            ● ALERT SYSTEM ONLINE
-        </span>
-
-    </div>
-
 
     <!-- =====================================================
-         ALERT SYSTEM STATUS CARDS
+         RIGHT SIDEBAR
     ====================================================== -->
 
-    <div class="alert-center-grid">
-
-        <div class="alert-control-card">
-
-            <div class="alert-control-icon">
-                📍
-            </div>
-
-            <div>
-
-                <span>
-                    Monitoring Location
-                </span>
-
-                <strong id="alert-monitor-location">
-                    Current map location
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="alert-control-card">
-
-            <div class="alert-control-icon">
-                📡
-            </div>
-
-            <div>
-
-                <span>
-                    Detection
-                </span>
-
-                <strong>
-                    Automatic
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="alert-control-card">
-
-            <div class="alert-control-icon">
-                📱
-            </div>
-
-            <div>
-
-                <span>
-                    SMS Alerts
-                </span>
-
-                <strong id="sms-status">
-                    Not configured
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="alert-control-card">
-
-            <div class="alert-control-icon">
-                🔔
-            </div>
-
-            <div>
-
-                <span>
-                    Browser Push
-                </span>
-
-                <strong id="push-status">
-                    Not enabled
-                </strong>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         NOTIFICATION CONFIGURATION
-    ====================================================== -->
-
-    <div class="alert-configuration">
-
-        <div class="alert-config-header">
-
-            <div>
-
-                <h3>
-                    📲 Community Alert Subscription
-                </h3>
-
-                <p>
-                    Register an authority, field officer or
-                    community contact to receive alerts when
-                    high-risk conditions are detected nearby.
-                </p>
-
-            </div>
-
-        </div>
-
-
-        <div class="alert-form-grid">
-
-            <label>
-
-                Name
-
-                <input
-                    id="alert-subscriber-name"
-                    type="text"
-                    placeholder="District Control Room"
-                    maxlength="120"
-                >
-
-            </label>
-
-
-            <label>
-
-                Mobile Number
-
-                <input
-                    id="alert-subscriber-phone"
-                    type="tel"
-                    placeholder="+91XXXXXXXXXX"
-                    maxlength="32"
-                >
-
-            </label>
-
-
-            <label>
-
-                Alert Radius
-
-                <select
-                    id="alert-radius"
-                >
-
-                    <option value="2">
-                        2 km
-                    </option>
-
-                    <option value="5" selected>
-                        5 km
-                    </option>
-
-                    <option value="10">
-                        10 km
-                    </option>
-
-                    <option value="20">
-                        20 km
-                    </option>
-
-                    <option value="50">
-                        50 km
-                    </option>
-
-                </select>
-
-            </label>
-
-
-            <label>
-
-                Location
-
-                <input
-                    id="alert-subscriber-location"
-                    type="text"
-                    value="Current map location"
-                    readonly
-                >
-
-            </label>
-
-        </div>
+    <aside class="sidebar-alerts">
 
 
         <!-- =================================================
-             CHANNEL TOGGLES
+             IMMEDIATE WARNINGS
         ================================================== -->
 
-        <div class="alert-channel-row">
+        <section class="panel alerts-panel">
 
-            <label class="alert-toggle">
+            <h2>
+                🚨 Immediate Warnings
+            </h2>
 
-                <input
-                    id="enable-subscriber-sms"
-                    type="checkbox"
-                    checked
-                >
+            <div id="alerts">
 
-                <span>
-                    📱 Receive SMS alerts
-                </span>
+                <div class="alert low">
 
-            </label>
+                    <span class="alert-symbol">
+                        ✓
+                    </span>
 
+                    <div>
 
-            <label class="alert-toggle">
+                        <strong>
+                            NO CRITICAL ALERTS
+                        </strong>
 
-                <input
-                    id="enable-subscriber-push"
-                    type="checkbox"
-                    checked
-                >
+                        <p>
+                            No immediate landslide emergencies
+                            declared in this sector.
+                        </p>
 
-                <span>
-                    🔔 Receive browser notifications
-                </span>
+                    </div>
 
-            </label>
-
-        </div>
-
-
-        <div class="alert-action-row">
-
-            <button
-                id="register-alert-subscriber"
-                class="primary-button alert-register-button"
-                type="button"
-            >
-                🚨 Register for Emergency Alerts
-            </button>
-
-
-            <button
-                id="enable-push-alerts"
-                class="secondary-button alert-push-button"
-                type="button"
-            >
-                🔔 Enable Push Notifications
-            </button>
-
-        </div>
-
-
-        <div
-            id="alert-registration-status"
-            class="alert-registration-status"
-        >
-            Select your location on the map and register
-            to receive nearby risk alerts.
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         OFFLINE ALERT STATUS
-    ====================================================== -->
-
-    <div
-        id="offline-alert-panel"
-        class="offline-alert-panel"
-    >
-
-        <div class="offline-alert-icon">
-            📡
-        </div>
-
-        <div>
-
-            <strong id="offline-alert-title">
-                Connectivity Monitoring Active
-            </strong>
-
-            <p id="offline-alert-message">
-                The system will retain the last known risk
-                state if network connectivity is interrupted.
-            </p>
-
-        </div>
-
-        <span
-            id="offline-alert-badge"
-            class="offline-alert-badge online"
-        >
-            ONLINE
-        </span>
-
-    </div>
-
-
-    <!-- =====================================================
-         ALERT DELIVERY STATUS
-    ====================================================== -->
-
-    <div class="alert-delivery-summary">
-
-        <div>
-
-            <span>
-                Last Alert
-            </span>
-
-            <strong id="last-alert-time">
-                No alerts yet
-            </strong>
-
-        </div>
-
-
-        <div>
-
-            <span>
-                SMS Deliveries
-            </span>
-
-            <strong id="sms-delivery-count">
-                0
-            </strong>
-
-        </div>
-
-
-        <div>
-
-            <span>
-                Push Deliveries
-            </span>
-
-            <strong id="push-delivery-count">
-                0
-            </strong>
-
-        </div>
-
-
-        <div>
-
-            <span>
-                Active Warnings
-            </span>
-
-            <strong id="center-warning-count">
-                0
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         DEMO / TEST ALERT
-    ====================================================== -->
-
-    <div class="alert-test-area">
-
-        <div>
-
-            <strong>
-                SIH Demonstration
-            </strong>
-
-            <p>
-                Send a test alert to verify the notification
-                pipeline before the final demonstration.
-            </p>
-
-        </div>
-
-        <button
-            id="test-critical-alert"
-            class="danger-button"
-            type="button"
-        >
-            🚨 Test Critical Alert
-        </button>
-
-    </div>
-
-</section>
-    <!-- =====================================================
-         LOCAL ALERTS
-    ====================================================== -->
-
-    <section class="panel alerts-panel">
-
-        <h2>
-            ⚠ Local Alerts
-        </h2>
-
-
-        <div id="alerts">
-
-            <div class="alert">
-
-                No active alerts.
+                </div>
 
             </div>
 
-        </div>
-
-    </section>
+        </section>
 
 
+        <!-- =================================================
+             SELECTED SECTOR
+        ================================================== -->
 
-    <!-- =====================================================
-         SELECTED LOCATION
-    ====================================================== -->
+        <section class="panel location-panel">
 
-    <section class="panel location-panel">
+            <h2>
+                📍 Selected Sector
+            </h2>
 
-        <h2>
-            📍 Selected Location
-        </h2>
-
-
-        <div
-            id="location"
-            class="location-details"
-        >
-
-            Click on the map to select a location.
-
-        </div>
+            <div
+                id="location"
+                class="location-details"
+            >
+                Click the map to review specific coordinates.
+            </div>
 
 
-        <button
-            id="analyze-button"
-            class="primary-button"
-            type="button"
-        >
-
-            Analyze Live Risk
-
-        </button>
+            <button
+                id="analyze-button"
+                class="primary-button"
+                type="button"
+            >
+                Check Sector Risk
+            </button>
 
 
-        <div
-            id="analysis-status"
-            class="analysis-status"
-        >
+            <div
+                id="analysis-status"
+                class="analysis-status"
+            >
+                Ready to check local safety status.
+            </div>
 
-            Select a location and analyze its current
-            satellite-based risk.
+        </section>
 
-        </div>
 
-    </section>
+        <!-- =================================================
+             WEATHER
+        ================================================== -->
+
+        <section class="panel weather-panel">
+
+            <h2>
+                🌧️ Live Weather Conditions
+            </h2>
+
+            <div id="weather-status">
+
+                Select a sector to load weather readings.
+
+            </div>
+
+
+            <div
+                id="weather-content"
+                class="weather-content hidden"
+            >
+
+                <div class="weather-grid public-weather-grid">
+
+
+                    <div class="weather-item">
+
+                        <span>
+                            Temperature
+                        </span>
+
+                        <strong id="weather-temperature">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-item">
+
+                        <span>
+                            Humidity
+                        </span>
+
+                        <strong id="weather-humidity">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-item">
+
+                        <span>
+                            Current Rain
+                        </span>
+
+                        <strong id="weather-current-rain">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-item">
+
+                        <span>
+                            Wind Speed
+                        </span>
+
+                        <strong id="weather-wind">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-item">
+
+                        <span>
+                            Rainfall (24h)
+                        </span>
+
+                        <strong id="weather-rainfall-24">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="weather-item">
+
+                        <span>
+                            Rainfall (72h)
+                        </span>
+
+                        <strong id="weather-rainfall-72">
+                            --
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="rainfall-alert"
+                    class="weather-alert"
+                >
+                    --
+                </div>
+
+            </div>
+
+        </section>
+
+    </aside>
 
 
 
@@ -740,14 +500,33 @@
 
     <section class="panel risk-panel">
 
-        <h2>
-            Risk Details
-        </h2>
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>
+                    ⚠️ Local Risk Assessment
+                </h2>
+
+                <p class="section-description">
+                    Detailed landslide probability for the selected
+                    sector.
+                </p>
+
+            </div>
+
+        </div>
 
 
         <div id="risk">
 
-            No prediction available.
+            <div class="empty-state">
+
+                Select a location and run
+                <strong>Check Sector Risk</strong>
+                to view the assessment.
+
+            </div>
 
         </div>
 
@@ -770,21 +549,17 @@
                 </h2>
 
                 <p class="section-description">
-
-                    Locations with recent AI-based
-                    landslide risk predictions.
-
+                    Locations with recent AI-based landslide
+                    risk predictions.
                 </p>
 
             </div>
-
 
             <span
                 id="risk-zone-count"
                 class="section-count"
             >
                 0
-
             </span>
 
         </div>
@@ -808,139 +583,27 @@
 
 
     <!-- =====================================================
-         RISK RANKING
-    ====================================================== -->
-
-   
-
-
-    <!-- =====================================================
-         WEATHER
-    ====================================================== -->
-
-    <section class="panel weather-panel">
-
-        <h2>
-            🌧️ Weather & Rainfall
-        </h2>
-
-
-        <div id="weather-status">
-
-            Select a location to load weather data.
-
-        </div>
-
-
-        <div
-            id="weather-content"
-            class="weather-content hidden"
-        >
-
-            <div class="weather-grid">
-
-                <div class="weather-item">
-
-                    <span>
-                        Temperature
-                    </span>
-
-                    <strong id="weather-temperature">
-                        --
-                    </strong>
-
-                </div>
-
-
-                <div class="weather-item">
-
-                    <span>
-                        Humidity
-                    </span>
-
-                    <strong id="weather-humidity">
-                        --
-                    </strong>
-
-                </div>
-
-
-                <div class="weather-item">
-
-                    <span>
-                        Current Rain
-                    </span>
-
-                    <strong id="weather-current-rain">
-                        --
-                    </strong>
-
-                </div>
-
-
-                <div class="weather-item">
-
-                    <span>
-                        Wind Speed
-                    </span>
-
-                    <strong id="weather-wind">
-                        --
-                    </strong>
-
-                </div>
-
-
-                <div class="weather-item">
-
-                    <span>
-                        Rainfall — 24h
-                    </span>
-
-                    <strong id="weather-rainfall-24">
-                        --
-                    </strong>
-
-                </div>
-
-
-                <div class="weather-item">
-
-                    <span>
-                        Rainfall — 72h
-                    </span>
-
-                    <strong id="weather-rainfall-72">
-                        --
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="rainfall-alert"
-                class="weather-alert"
-            >
-                --
-            </div>
-
-        </div>
-
-    </section>
-
-
-
-    <!-- =====================================================
          RISK HISTORY
     ====================================================== -->
 
     <section class="panel history-panel">
 
-        <h2>
-            📈 Risk History
-        </h2>
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>
+                    📈 Risk History
+                </h2>
+
+                <p class="section-description">
+                    Historical risk trend for the selected
+                    monitoring sector.
+                </p>
+
+            </div>
+
+        </div>
 
 
         <div
@@ -968,18 +631,23 @@
 
     <section class="panel prediction-panel">
 
-        <h2>
-            🤖 AI Landslide Prediction
-        </h2>
+        <div class="section-heading-row">
 
+            <div>
 
-        <p class="prediction-description">
+                <h2>
+                    🤖 AI Landslide Prediction
+                </h2>
 
-            Live satellite analysis uses environmental
-            features extracted from Google Earth Engine
-            and the trained SVM RBF model.
+                <p class="prediction-description">
+                    Live satellite analysis uses environmental
+                    features extracted from Google Earth Engine
+                    and the trained SVM RBF model.
+                </p>
 
-        </p>
+            </div>
+
+        </div>
 
 
         <div class="prediction-info-grid">
@@ -1045,7 +713,10 @@
         >
 
             Select a location and click
-            <strong>Analyze Live Risk</strong>.
+            <strong>
+                Check Sector Risk
+            </strong>
+            to run the AI assessment.
 
         </div>
 
@@ -1054,104 +725,552 @@
 
 
     <!-- =====================================================
-         VULNERABLE ROADS — PLACEHOLDER FOR STAGE 2
+         VULNERABLE ROADS
     ====================================================== -->
 
-    <!-- =========================================================
-     VULNERABLE ROADS
-========================================================= -->
-
-<section class="panel vulnerable-roads-panel" id="vulnerable-roads-panel">
-
-    <div class="section-heading-row">
-
-        <div>
-
-            <h2>
-                🛣️ Vulnerable Roads
-            </h2>
-
-            <p class="section-description">
-                Road segments exposed to nearby landslide-risk
-                zones within the selected analysis area.
-            </p>
-
-        </div>
-
-        <div
-            id="road-count"
-            class="section-count"
-        >
-            0
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         ROAD ANALYSIS STATUS
-    ====================================================== -->
-
-    <div
-        id="road-status"
-        class="road-status"
+    <section
+        class="panel vulnerable-roads-panel"
+        id="vulnerable-roads-panel"
     >
 
-        Run live analysis to identify potentially vulnerable
-        roads.
+        <div class="section-heading-row">
 
-    </div>
+            <div>
 
+                <h2>
+                    🛣️ Road Safety & Travel Advisories
+                </h2>
 
-    <!-- =====================================================
-         ROAD SUMMARY
-    ====================================================== -->
+                <p class="section-description">
+                    Identified road stretches susceptible to
+                    debris fall, rockslide, or subsidence.
+                </p>
 
-    <div
-        id="road-summary"
-        class="road-summary"
-    >
-
-        <!-- JavaScript will populate this -->
-
-    </div>
-
-
-    <!-- =====================================================
-         ROAD LIST
-    ====================================================== -->
-
-    <div
-        id="road-list"
-        class="road-list"
-    >
-
-        <div class="road-empty">
-
-            <div class="road-empty-icon">
-                🛣️
             </div>
 
-            <strong>
-                No road analysis yet
-            </strong>
-
-            <p>
-                Select a location and click
-                <strong>Analyze Live Risk</strong>
-                to identify potentially vulnerable road
-                segments.
-            </p>
+            <div
+                id="road-count"
+                class="section-count"
+            >
+                0
+            </div>
 
         </div>
 
-    </div>
 
-</section>
+        <!-- ROAD STATUS -->
+
+        <div
+            id="road-status"
+            class="road-status"
+        >
+
+            Select a location and check sector risk
+            to view road safety.
+
+        </div>
+
+
+        <!-- ROAD SUMMARY -->
+
+        <div
+            id="road-summary"
+            class="road-summary"
+        >
+        </div>
+
+
+        <!-- ROAD LIST -->
+
+        <div
+            id="road-list"
+            class="road-list"
+        >
+
+            <div class="road-empty">
+
+                <div class="road-empty-icon">
+                    🛣️
+                </div>
+
+                <strong>
+                    No road analysis yet
+                </strong>
+
+                <p>
+                    Select a location and click
+                    <strong>
+                        Check Sector Risk
+                    </strong>
+                    to identify potentially vulnerable
+                    road segments.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         COMMUNITY ALERT CENTRE
+    ====================================================== -->
+
+    <section
+        class="panel alert-center-panel"
+        id="alert-center"
+    >
+
+        <div class="section-heading-row">
+
+            <div>
+
+                <h2>
+                    🔔 Community Alert Subscription
+                </h2>
+
+                <p class="section-description">
+                    Register a contact to receive emergency
+                    notifications when high-risk conditions
+                    are detected nearby.
+                </p>
+
+            </div>
+
+            <span
+                id="alert-system-status"
+                class="alert-system-status online"
+            >
+                ● ALERT SYSTEM ONLINE
+            </span>
+
+        </div>
+
+
+        <!-- ALERT STATUS -->
+
+        <div class="alert-center-grid">
+
+
+            <div class="alert-control-card">
+
+                <div class="alert-control-icon">
+                    📍
+                </div>
+
+                <div>
+
+                    <span>
+                        Monitoring Location
+                    </span>
+
+                    <strong id="alert-monitor-location">
+                        Current map location
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert-control-card">
+
+                <div class="alert-control-icon">
+                    📡
+                </div>
+
+                <div>
+
+                    <span>
+                        Detection
+                    </span>
+
+                    <strong>
+                        Automatic
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert-control-card">
+
+                <div class="alert-control-icon">
+                    📱
+                </div>
+
+                <div>
+
+                    <span>
+                        SMS Alerts
+                    </span>
+
+                    <strong id="sms-status">
+                        Not configured
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="alert-control-card">
+
+                <div class="alert-control-icon">
+                    🔔
+                </div>
+
+                <div>
+
+                    <span>
+                        Browser Push
+                    </span>
+
+                    <strong id="push-status">
+                        Not enabled
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ALERT CONFIGURATION -->
+
+        <div class="alert-configuration">
+
+            <div class="alert-config-header">
+
+                <h3>
+                    📲 Emergency Alert Registration
+                </h3>
+
+                <p>
+                    Register your contact to receive alerts
+                    when high-risk conditions are detected
+                    within your selected radius.
+                </p>
+
+            </div>
+
+
+            <div class="alert-form-grid">
+
+
+                <label>
+
+                    Name
+
+                    <input
+                        id="alert-subscriber-name"
+                        type="text"
+                        placeholder="Citizen / Community Contact"
+                        maxlength="120"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Mobile Number
+
+                    <input
+                        id="alert-subscriber-phone"
+                        type="tel"
+                        placeholder="+91XXXXXXXXXX"
+                        maxlength="32"
+                    >
+
+                </label>
+
+
+                <label>
+
+                    Alert Radius
+
+                    <select id="alert-radius">
+
+                        <option value="2">
+                            2 km
+                        </option>
+
+                        <option
+                            value="5"
+                            selected
+                        >
+                            5 km
+                        </option>
+
+                        <option value="10">
+                            10 km
+                        </option>
+
+                        <option value="20">
+                            20 km
+                        </option>
+
+                        <option value="50">
+                            50 km
+                        </option>
+
+                    </select>
+
+                </label>
+
+
+                <label>
+
+                    Location
+
+                    <input
+                        id="alert-subscriber-location"
+                        type="text"
+                        value="Current map location"
+                        readonly
+                    >
+
+                </label>
+
+            </div>
+
+
+            <!-- CHANNEL TOGGLES -->
+
+            <div class="alert-channel-row">
+
+                <label class="alert-toggle">
+
+                    <input
+                        id="enable-subscriber-sms"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <span>
+                        📱 Receive SMS alerts
+                    </span>
+
+                </label>
+
+
+                <label class="alert-toggle">
+
+                    <input
+                        id="enable-subscriber-push"
+                        type="checkbox"
+                        checked
+                    >
+
+                    <span>
+                        🔔 Receive browser notifications
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <!-- ACTION BUTTONS -->
+
+            <div class="alert-action-row">
+
+                <button
+                    id="register-alert-subscriber"
+                    class="primary-button alert-register-button"
+                    type="button"
+                >
+                    🚨 Register for Emergency Alerts
+                </button>
+
+
+                <button
+                    id="enable-push-alerts"
+                    class="secondary-button alert-push-button"
+                    type="button"
+                >
+                    🔔 Enable Push Notifications
+                </button>
+
+            </div>
+
+
+            <div
+                id="alert-registration-status"
+                class="alert-registration-status"
+            >
+                Select your location on the map and register
+                to receive nearby risk alerts.
+            </div>
+
+        </div>
+
+
+        <!-- OFFLINE STATUS -->
+
+        <div
+            id="offline-alert-panel"
+            class="offline-alert-panel"
+        >
+
+            <div class="offline-alert-icon">
+                📡
+            </div>
+
+            <div>
+
+                <strong id="offline-alert-title">
+                    Connectivity Monitoring Active
+                </strong>
+
+                <p id="offline-alert-message">
+                    The system will retain the last known
+                    risk state if network connectivity is
+                    interrupted.
+                </p>
+
+            </div>
+
+            <span
+                id="offline-alert-badge"
+                class="offline-alert-badge online"
+            >
+                ONLINE
+            </span>
+
+        </div>
+
+
+        <!-- DELIVERY SUMMARY -->
+
+        <div class="alert-delivery-summary">
+
+
+            <div>
+
+                <span>
+                    Last Alert
+                </span>
+
+                <strong id="last-alert-time">
+                    No alerts yet
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    SMS Deliveries
+                </span>
+
+                <strong id="sms-delivery-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Push Deliveries
+                </span>
+
+                <strong id="push-delivery-count">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div>
+
+                <span>
+                    Active Warnings
+                </span>
+
+                <strong id="center-warning-count">
+                    0
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <!-- DEMONSTRATION -->
+
+        <div class="alert-test-area">
+
+            <div>
+
+                <strong>
+                    SIH Demonstration
+                </strong>
+
+                <p>
+                    Send a test alert to verify the
+                    notification pipeline before the
+                    final demonstration.
+                </p>
+
+            </div>
+
+            <button
+                id="test-critical-alert"
+                class="danger-button"
+                type="button"
+            >
+                🚨 Test Critical Alert
+            </button>
+
+        </div>
+
+    </section>
 
 
 </main>
 
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="footer">
+
+    <div>
+
+        <strong>
+            North Eastern Region Disaster Management Cell
+        </strong>
+
+        <span>
+            Emergency Public Advisory Services •
+            Toll Free: 1070 / 112
+        </span>
+
+    </div>
+
+
+    <div class="footer-right">
+
+        <a
+            href="official.html"
+            style="color:#94a3b8; text-decoration:none;"
+        >
+            Department Login
+        </a>
+
+    </div>
+
+</footer>
 
 
 <!-- =========================================================
@@ -1163,7 +1282,6 @@
 </script>
 
 
-
 <!-- =========================================================
      CHART.JS
 ========================================================= -->
@@ -1173,16 +1291,20 @@
 </script>
 
 
-
 <!-- =========================================================
      APPLICATION JS
 ========================================================= -->
 
 <script src="app.js"></script>
 
+
+<!-- =========================================================
+     ALERT RUNTIME
+========================================================= -->
+
 <script src="final_alert_runtime.js"></script>
 
 
 </body>
 
-</html>>
+</html>
